@@ -9,21 +9,30 @@ import (
 )
 
 var errHash = errors.New("mock hash error")
+var errGetNode = errors.New("mock get node error")
 
 type mockHasher struct {
 	err error
 }
 
+type mockBrowser struct {
+	err error
+}
+
 func TestFileHandler(t *testing.T) {
 	tests := []struct {
-		name   string
-		paths  []string
-		expRes []FileInfo
-		expErr error
+		name       string
+		paths      []string
+		hashErr    error
+		getNodeErr error
+		expRes     []FileInfo
+		expErr     error
 	}{
 		{
-			name:  "should generate a list, if given some filepaths",
-			paths: []string{"file1", "file2"},
+			name:       "should generate a list, if given some filepaths",
+			paths:      []string{"file1", "file2"},
+			hashErr:    nil,
+			getNodeErr: nil,
 			expRes: []FileInfo{
 				{"file1", "file1", ""},
 				{"file2", "file2", ""},
@@ -31,8 +40,10 @@ func TestFileHandler(t *testing.T) {
 			expErr: nil,
 		},
 		{
-			name:  "should generate a list, if given some filepaths, and omit 'uploader.exe'",
-			paths: []string{"file1", "file2", excludedFileNames[0]},
+			name:       "should generate a list, if given some filepaths, and omit 'hashes.json'",
+			paths:      []string{"file1", "file2", excludedFileNames[0]},
+			hashErr:    nil,
+			getNodeErr: nil,
 			expRes: []FileInfo{
 				{"file1", "file1", ""},
 				{"file2", "file2", ""},
@@ -40,23 +51,37 @@ func TestFileHandler(t *testing.T) {
 			expErr: nil,
 		},
 		{
-			name:   "should leave the list empty, if no filepaths were given",
-			paths:  nil,
-			expRes: nil,
-			expErr: nil,
+			name:       "should leave the list empty, if no filepaths were given",
+			paths:      nil,
+			hashErr:    nil,
+			getNodeErr: nil,
+			expRes:     nil,
+			expErr:     nil,
 		},
 		{
-			name:   "should return an error, if failed to generate a hash",
-			paths:  []string{"invalid path"},
-			expRes: nil,
-			expErr: errHash,
+			name:       "should return an error, if failed to generate a hash",
+			paths:      []string{"invalid path"},
+			hashErr:    errHash,
+			getNodeErr: nil,
+			expRes:     nil,
+			expErr:     errHash,
+		},
+		{
+			name:       "should return an error, if failed to get object node",
+			paths:      []string{"file1", "file2"},
+			hashErr:    nil,
+			getNodeErr: errGetNode,
+			expRes:     nil,
+			expErr:     errGetNode,
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			handler := NewFileHandler()
-			mockHasher := &mockHasher{test.expErr}
+			mockHasher := &mockHasher{test.hashErr}
+			mockBrowser := &mockBrowser{test.getNodeErr}
 			handler.hasher = mockHasher
+			handler.storageBrowser = mockBrowser
 			for _, path := range test.paths {
 				err := handler.Handle(path)
 				require.Equal(t, test.expErr, err)
@@ -71,4 +96,8 @@ func (m *mockHasher) HashFile(file string) (string, error) {
 		return "", m.err
 	}
 	return file, nil
+}
+
+func (m *mockBrowser) GetObjectNode(file string) (string, error) {
+	return "", m.err
 }
