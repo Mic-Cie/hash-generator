@@ -2,6 +2,7 @@ package hashgenerator
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,11 @@ type fileHandlerMock struct {
 }
 
 func TestFileBrowserSuccessCase(t *testing.T) {
-	expList := []string{"testDir\\file1.txt", "testDir\\file2.txt", "testDir\\subDir\\file3.txt"}
+	expList := []string{
+		filepath.Join(testDir, "file1.txt"),
+		filepath.Join(testDir, "file2.txt"),
+		filepath.Join(testDir, "subDir", "file3.txt"),
+	}
 	handler := fileHandlerMock{
 		err: nil,
 	}
