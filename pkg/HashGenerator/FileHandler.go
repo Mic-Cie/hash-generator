@@ -5,7 +5,7 @@ import (
 )
 
 // excludedFilesNames are names that should be excluded from handling
-var excludedFileNames = []string{"hashes.json"}
+var excludedFileNames = []string{localHashesFileName, serverHashesFileName}
 
 type FileHandler interface {
 	Handle(path string) error
@@ -23,11 +23,11 @@ type fileHandler struct {
 	storageBrowser StorageBrowser
 }
 
-func NewFileHandler() fileHandler {
+func NewFileHandler(storageBrowser StorageBrowser) fileHandler {
 	hasher := NewFileHasher()
 	return fileHandler{
 		hasher:         &hasher,
-		storageBrowser: &MegaBrowser{},
+		storageBrowser: storageBrowser,
 	}
 }
 

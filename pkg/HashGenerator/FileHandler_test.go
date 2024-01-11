@@ -41,7 +41,18 @@ func TestFileHandler(t *testing.T) {
 		},
 		{
 			name:       "should generate a list, if given some filepaths, and omit 'hashes.json'",
-			paths:      []string{"file1", "file2", excludedFileNames[0]},
+			paths:      []string{"file1", "file2", "hashes.json"},
+			hashErr:    nil,
+			getNodeErr: nil,
+			expRes: []FileInfo{
+				{"file1", "file1", ""},
+				{"file2", "file2", ""},
+			},
+			expErr: nil,
+		},
+		{
+			name:       "should generate a list, if given some filepaths, and omit 'hashes_server.json'",
+			paths:      []string{"file1", "file2", "hashes_server.json"},
 			hashErr:    nil,
 			getNodeErr: nil,
 			expRes: []FileInfo{
@@ -77,11 +88,11 @@ func TestFileHandler(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			handler := NewFileHandler()
-			mockHasher := &mockHasher{test.hashErr}
 			mockBrowser := &mockBrowser{test.getNodeErr}
+			handler := NewFileHandler(mockBrowser)
+			mockHasher := &mockHasher{test.hashErr}
 			handler.hasher = mockHasher
-			handler.storageBrowser = mockBrowser
+
 			for _, path := range test.paths {
 				err := handler.Handle(path)
 				require.Equal(t, test.expErr, err)
