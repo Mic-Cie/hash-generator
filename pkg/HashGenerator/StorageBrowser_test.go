@@ -7,7 +7,7 @@ import (
 )
 
 func TestShouldGetObjectNode(t *testing.T) {
-	storageBrowser := MegaBrowser{}
+	storageBrowser, _ := NewMegaBrowser()
 	node, err := storageBrowser.GetObjectNode("")
 	assert.Equal(t, "", node)
 	assert.Nil(t, err)

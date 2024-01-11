@@ -7,6 +7,10 @@ type StorageBrowser interface {
 type MegaBrowser struct {
 }
 
+func NewMegaBrowser() (*MegaBrowser, error) {
+	return &MegaBrowser{}, nil
+}
+
 func (b *MegaBrowser) GetObjectNode(file string) (string, error) {
 	return "", nil
 }
