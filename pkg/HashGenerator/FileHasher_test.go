@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const filePath = "testDir/file1.txt"
+const testFilePath = "testDir/file1.txt"
 
 var errCopyBuffer = fmt.Errorf("mock error")
 
@@ -19,7 +19,7 @@ func TestShouldReturnHashIfSuccessfullyLoadedAFile(t *testing.T) {
 	expHashLength := 64
 
 	fh := NewFileHasher()
-	hash, err := fh.HashFile(filePath)
+	hash, err := fh.HashFile(testFilePath)
 	assert.Equal(t, expHashLength, len(hash))
 	assert.Nil(t, err)
 }
@@ -35,7 +35,7 @@ func TestShouldFailIfFailedOpeningAFile(t *testing.T) {
 func TestShouldFailIfCouldNotCopyBuffer(t *testing.T) {
 	fh := NewFileHasher()
 	mockBuffer := mockWriter{}
-	err := fh.fillHashBuffer(&mockBuffer, filePath)
+	err := fh.fillHashBuffer(&mockBuffer, testFilePath)
 	require.NotNil(t, err)
 	assert.Equal(t, errCopyBuffer, err)
 }
