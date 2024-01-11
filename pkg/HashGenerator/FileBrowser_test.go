@@ -52,7 +52,7 @@ func TestFileBrowserFailCase(t *testing.T) {
 			name:      "should return an error, if failed to browse directory",
 			path:      "dirDoesntExist",
 			handleErr: nil,
-			expErrMsg: "CreateFile dirDoesntExist:",
+			expErrMsg: "dirDoesntExist:",
 		},
 	}
 	for _, test := range tests {
